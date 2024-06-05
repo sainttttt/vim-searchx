@@ -272,8 +272,8 @@ function! s:on_input(...) abort
 
     " Search off-screen match.
     if empty(s:state.matches.matches)
-      echom "no matches"
-      echom s:state.direction
+      " echom "no matches"
+      " echom s:state.direction
 
       silent noautocmd call winrestview(s:state.firstview)
       let l:next_pos = searchpos(@/, s:state.direction == s:Direction.Next ? 'zn' : 'bn')
@@ -284,8 +284,8 @@ function! s:on_input(...) abort
     " Move to current match.
     else
 
-      echom "matches"
-      echom s:state.direction
+      " echom "matches"
+      " echom s:state.direction
 
       if s:state.matches.current isnot v:null
         call searchx#cursor#goto([s:state.matches.current.lnum, s:state.matches.current.col])
@@ -391,7 +391,7 @@ function! s:find_matches(input, curpos) abort
 
 
     " wrap match
-    
+
     for l:i in range(0, len(l:texts_wrap) - 1)
       let l:text = l:texts_wrap[l:i]
       let l:off = 0
@@ -426,7 +426,7 @@ function! s:find_matches(input, curpos) abort
         let l:off = l:match.end_col
       endwhile
     endfor
-  
+
     " Select current match.
     let l:next = empty(l:next) ? l:prev : l:next
     let l:prev = empty(l:prev) ? l:next : l:prev
@@ -448,7 +448,7 @@ function! s:find_matches(input, curpos) abort
 
 
     " wrap match
-    
+
     for l:i in range(0, len(l:texts_wrap) - 1)
       let l:text = l:texts_wrap[l:i]
       let l:off = 0
@@ -534,7 +534,7 @@ function! s:find_matches(input, curpos) abort
         let l:off = l:match.end_col
       endwhile
     endfor
-  
+
     " " Select current match.
     " let l:next = empty(l:next) ? l:prev : l:next
     " let l:prev = empty(l:prev) ? l:next : l:prev

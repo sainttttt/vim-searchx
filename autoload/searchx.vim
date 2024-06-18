@@ -247,6 +247,7 @@ function! s:on_input(...) abort
       else
         let s:state.prompt_emptily = v:true
       endif
+      return
     else
       let s:state.prompt_emptily = v:false
     endif
@@ -272,21 +273,13 @@ function! s:on_input(...) abort
 
     " Search off-screen match.
     if empty(s:state.matches.matches)
-      " echom "no matches"
-      " echom s:state.direction
-
       silent noautocmd call winrestview(s:state.firstview)
       let l:next_pos = searchpos(@/, s:state.direction == s:Direction.Next ? 'zn' : 'bn')
       if l:next_pos[0] == 0
-        " let s:state.direction = s:state.direction == s:Direction.Next ? s:Direction.Prev : s:Direction.Next
       endif
       call searchx#next_dir()
     " Move to current match.
     else
-
-      " echom "matches"
-      " echom s:state.direction
-
       if s:state.matches.current isnot v:null
         call searchx#cursor#goto([s:state.matches.current.lnum, s:state.matches.current.col])
       endif
@@ -341,8 +334,6 @@ function! s:find_matches(input, curpos) abort
   let l:lnum_e = line('w$')
 
   if s:state.direction == 1
-    " echom "cat"
-    " echom "cat2"
     let l:lnum_start = line('w0')
     let l:lnum_s = a:curpos[0]
     let l:lnum_e = line('w$')
@@ -353,7 +344,7 @@ function! s:find_matches(input, curpos) abort
     let l:prev = v:null
     let l:matches = []
 
-    " forward match
+    " forward match from cursor to end of screen in chosen direction
     for l:i in range(0, len(l:texts) - 1)
       let l:text = l:texts[l:i]
       let l:off = 0
@@ -390,8 +381,7 @@ function! s:find_matches(input, curpos) abort
     endfor
 
 
-    " wrap match
-
+    " wrap match, from cursor to end of screen in opposite selected direction
     for l:i in range(0, len(l:texts_wrap) - 1)
       let l:text = l:texts_wrap[l:i]
       let l:off = 0
@@ -435,8 +425,8 @@ function! s:find_matches(input, curpos) abort
       let l:current.current = v:true
     endif
 
+  " reverse direction
   else
-    " echom 'reverse'
 
     let l:next = v:null
     let l:prev = v:null
@@ -446,9 +436,7 @@ function! s:find_matches(input, curpos) abort
     let l:texts_wrap = getbufline('%',l:lnum_start,  a:curpos[0])
     call reverse(l:texts_wrap)
 
-
     " wrap match
-
     for l:i in range(0, len(l:texts_wrap) - 1)
       let l:text = l:texts_wrap[l:i]
       let l:off = 0
@@ -490,7 +478,6 @@ function! s:find_matches(input, curpos) abort
     let l:prev = empty(l:prev) ? l:next : l:prev
 
     let l:current = l:next
-    " let l:current = s:state.direction == s:Direction.Next ? l:next : l:prev
     if !empty(l:current)
       let l:current.current = v:true
     endif
@@ -514,37 +501,12 @@ function! s:find_matches(input, curpos) abort
         \   'current': v:false,
         \ }
 
-        " echom len(l:matches)
-        " echom l:matches
-        " echom l:match
-
-"         " nearest next.
-"         if empty(l:next) && (a:curpos[0] < l:match.lnum || a:curpos[0] == l:match.lnum && a:curpos[1] <= l:match.col)
-"           let l:next = l:match
-"         endif
-
-"         " nearest prev.
-"         if a:curpos[0] > l:match.lnum || a:curpos[0] == l:match.lnum && a:curpos[1] >= l:match.col
-"           let l:prev = l:match
-"         endif
-
         " " add match.
         call add(l:matches, l:match)
 
         let l:off = l:match.end_col
       endwhile
     endfor
-
-    " " Select current match.
-    " let l:next = empty(l:next) ? l:prev : l:next
-    " let l:prev = empty(l:prev) ? l:next : l:prev
-    " " let l:current = s:state.direction == s:Direction.Next ? l:next : l:prev
-    " let l:current = l:next
-    " if !empty(l:current)
-    "   let l:current.current = v:true
-    " endif
-
-    " echom l:matches
   endif
 
 

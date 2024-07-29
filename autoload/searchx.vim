@@ -243,7 +243,7 @@ function! s:on_input(...) abort
     " Check prompt emptiness
     if strlen(l:input) == 0
       if s:state.prompt_emptily && l:option.is_userinput
-        call feedkeys("\<CR>", 'n')
+        call feedkeys(" \<BS>", 'n')
       else
         let s:state.prompt_emptily = v:true
       endif
@@ -279,11 +279,13 @@ function! s:on_input(...) abort
       endif
       call searchx#next_dir()
     " Move to current match.
+    "
     else
       if s:state.matches.current isnot v:null
         call searchx#cursor#goto([s:state.matches.current.lnum, s:state.matches.current.col])
       endif
       redraw
+
     endif
 
     doautocmd <nomodeline> User SearchxInputChanged
@@ -304,11 +306,13 @@ function s:refresh(...) abort
   for l:match in s:state.matches.matches
     if get(l:option, 'incsearch', v:true)
       if l:match.current
+
         call searchx#highlight#set_incsearch(l:match)
       endif
     endif
 
     if get(l:option, 'marker', v:true)
+
       call searchx#highlight#add_marker(l:match)
     endif
   endfor
@@ -455,7 +459,6 @@ function! s:find_matches(input, curpos) abort
         \   'current': v:false,
         \ }
 
-        echom l:match
         " nearest next.
         if empty(l:next) && (a:curpos[0] > l:match.lnum || a:curpos[0] == l:match.lnum && a:curpos[1] >= l:match.col)
           let l:next = l:match
